@@ -4,7 +4,7 @@
  * @flow
  */
 
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
     AppRegistry,
     StyleSheet,
@@ -12,21 +12,46 @@ import {
     View
 } from 'react-native';
 import Login from './Login';
+import AppContainer from './AppContainer';
 
 export default class GithubBrowser extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isLoggedIn: true
+        }
+    }
+
     render() {
-        return (
-            <View style={styles.container}>
-                <Login/>
-            </View>
-        );
+        if (this.state.isLoggedIn) {
+            return (
+                <AppContainer/>
+            )
+        } else {
+            return (
+                <View style={styles.container}>
+                    <Login onLogin={this.onLogin}/>
+                </View>
+            );
+        }
+
+    }
+
+    onLogin() {
+        this.setState({ isLoggedIn: true })
     }
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
+    welcome: {
+        color: 'black',
+        fontSize: 28,
+    }
 });
 
 AppRegistry.registerComponent('GithubBrowser', () => GithubBrowser);

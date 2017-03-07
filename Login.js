@@ -15,7 +15,7 @@ import {
     Image,
     View,
 } from 'react-native';
-import buffer from 'buffer';
+import AuthService from './AuthService';
 
 export default class Login extends Component {
     constructor(props) {
@@ -74,37 +74,14 @@ export default class Login extends Component {
 
     onLoginPressed() {
         this.setState({ showProgress: true });
-
-        let b = buffer.Buffer(this.state.username + ':' + this.state.password);
-        const encodedAuth = b.toString('base64');
-
-        fetch('https://api.github.com/user', {
-            headers: {
-                'Authorization': 'Basic ' + encodedAuth
+        AuthService.login({
+            username: this.state.username,
+            password: this.state.password,
+        }, (results)=>{
+            this.setState(Object.assign({ showProgress: false}, results));
+            if(results.success && this.props.onLogin){
+                this.props.onLogin();
             }
-        })
-        .then((response) => {
-            if (response.status >= 200 && response.status <= 300) {
-                return response;
-            }
-            throw {
-                badCredential: response.status == 401,
-                unknownError: response.status != 401,
-            }
-        })
-        .then((response) => {
-            return response.json();
-        })
-        .then((results) => {
-            console.log(results);
-            this.setState({ showProgress: false })
-            this.setState({ success: true })
-        })
-        .catch((err) => {
-            this.setState(err)
-        })
-        .finally(() => {
-            this.setState({ showProgress: false })
         })
     }
 }
